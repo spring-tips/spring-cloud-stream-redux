@@ -16,6 +16,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -34,19 +36,21 @@ public class RmqAppApplication {
 		return om.writeValueAsString(o);
 	}
 
-	//
-	//--spring.cloud.stream.bindings.log-in-0.destination=my-topic
 	@Bean
-	Supplier<String> person(ObjectMapper objectMapper) {
+	Supplier<String> notificationSupplier(ObjectMapper objectMapper) {
+		var counter = new AtomicLong();
 		return () -> {
-			log.info("new person, comin' right up!");
-			return encode(objectMapper, Map.of("id", 1, "name", "Jane"));
+			log.info("new notification, comin' right up!");
+			return encode(objectMapper, Map.of(//
+				"id", counter.getAndIncrement(),
+				"details", "Sent @ " + Instant.now() //
+			));
 		};
 	}
 
 	@Bean
-	Consumer<String> log() {
-		return person -> log.info("new Person update received: " + person + " @ " + Instant.now());
+	Consumer<String> notificationConsumer() {
+		return notification -> log.info("new Person update received: " + notification + " @ " + Instant.now());
 	}
 }
 /*
