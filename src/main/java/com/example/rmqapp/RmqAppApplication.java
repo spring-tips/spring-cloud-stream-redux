@@ -53,14 +53,3 @@ public class RmqAppApplication {
 		return notification -> log.info("new Person update received: " + notification + " @ " + Instant.now());
 	}
 }
-/*
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-class Person {
-	private Integer id;
-	private String name;
-}
-*/
-
